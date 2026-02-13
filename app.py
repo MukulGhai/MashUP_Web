@@ -9,10 +9,11 @@ load_dotenv()
 
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
+from shutil import which
 
-# Tell pydub where ffmpeg & ffprobe are
-AudioSegment.converter = "ffmpeg"
-AudioSegment.ffprobe = "ffprobe"
+AudioSegment.converter = which("ffmpeg")
+AudioSegment.ffprobe = which("ffprobe")
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
