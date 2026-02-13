@@ -1,0 +1,7 @@
+flaskenv/
+mashupenv/
+__pycache__/
+downloads/
+output/
+.env
+*.exe

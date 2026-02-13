@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mashup Creator - Modern Music Fusion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0071e3;
+            --secondary: #555;
+            --bg-dark: #1d1d1d;
+            --bg-light: #f5f5f7;
+            --text-primary: #1d1d1d;
+            --text-secondary: #86868b;
+            --border: #e5e5e7;
+            --accent-blue: #0071e3;
+            --accent-cyan: #00bfff;
+            --accent-purple: #8b5cf6;
+
+            /* Dark mode variables */
+            --bg-dark-mode: #1a1a1a;
+            --bg-light-mode: #ffffff;
+            --text-primary-dark: #ffffff;
+            --text-secondary-dark: #a1a1a6;
+            --border-dark: #3a3a3c;
+        }
+
+        [data-theme="dark"] {
+            --bg-light: var(--bg-dark-mode);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border: var(--border-dark);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #efefef 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Water effect background elements */
+        .water-bubble {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(40px);
+        }
+
+        .water-bubble-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #0071e3, transparent);
+            top: -200px;
+            right: -100px;
+            animation: float-slow 15s ease-in-out infinite;
+        }
+
+        .water-bubble-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #00bfff, transparent);
+            bottom: -150px;
+            left: -100px;
+            animation: float-slow 20s ease-in-out infinite reverse;
+        }
+
+        .water-bubble-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #8b5cf6, transparent);
+            top: 50%;
+            right: 10%;
+            animation: float-slow 18s ease-in-out infinite;
+            animation-delay: -5s;
+        }
+
+        @keyframes float-slow {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(40px, -30px) scale(1.05);
+            }
+            66% {
+                transform: translate(-30px, 40px) scale(0.95);
+            }
+        }
+
+        /* Cluster effect - floating particles */
+        .cluster {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(0, 113, 227, 0.3);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 32px;
+            padding: 50px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            animation: slide-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes slide-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            width: 40px;
+            height: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-toggle::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(18px);
+        }
+
+        .theme-icon {
+            position: absolute;
+            font-size: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-icon.sun {
+            left: 4px;
+            opacity: 1;
+        }
+
+        .theme-icon.moon {
+            right: 4px;
+            opacity: 0;
+        }
+
+        [data-theme="dark"] .theme-icon.sun {
+            opacity: 0;
+        }
+
+        [data-theme="dark"] .theme-icon.moon {
+            opacity: 1;
+        }
+
+        .logo {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0071e3, #00bfff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 113, 227, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            opacity: 0.8;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            font-weight: 400;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder,
+        input[type="email"]::placeholder {
+            color: var(--text-secondary);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(0, 113, 227, 0.02);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        .helper-text {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 28px;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(0, 113, 227, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 113, 227, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .checkbox-group:hover {
+            background: rgba(0, 113, 227, 0.08);
+            border-color: rgba(0, 113, 227, 0.2);
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent-blue);
+            border-radius: 4px;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: 400;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 0.95em;
+            text-transform: none;
+            letter-spacing: normal;
+            opacity: 1;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #0071e3 0%, #0055cc 100%);
+            color: white;
+            grid-column: 1 / -1;
+            padding: 16px;
+            border: none;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0, 113, 227, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-generate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        .btn-generate:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 113, 227, 0.4);
+        }
+
+        .btn-generate:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: rgba(76, 200, 100, 0.1);
+            color: #34c759;
+            border: 1.5px solid rgba(76, 200, 100, 0.3);
+        }
+
+        .btn-download:hover {
+            background: rgba(76, 200, 100, 0.15);
+            border-color: rgba(76, 200, 100, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 200, 100, 0.15);
+        }
+
+        .btn-clear {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            border: 1.5px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 59, 48, 0.15);
+            border-color: rgba(255, 59, 48, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 59, 48, 0.15);
+        }
+
+        .message {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid;
+            font-weight: 500;
+            font-size: 0.95em;
+            animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message.success {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34c759;
+            border-color: rgba(52, 199, 89, 0.2);
+        }
+
+        .message.error {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            border-color: rgba(255, 59, 48, 0.2);
+        }
+
+        .message.loading {
+            background: rgba(0, 113, 227, 0.1);
+            color: #0071e3;
+            border-color: rgba(0, 113, 227, 0.2);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 113, 227, 0.2);
+            border-top: 2px solid #0071e3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .player-section {
+            margin-top: 30px;
+            padding: 24px;
+            background: rgba(0, 113, 227, 0.04);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 113, 227, 0.1);
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .player-section.active {
+            opacity: 1;
+            max-height: 300px;
+        }
+
+        .player-header {
+            margin-bottom: 20px;
+        }
+
+        .player-header h3 {
+            font-size: 1.2em;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .player-header p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        audio {
+            width: 100%;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .player-info {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .container {
+                padding: 35px 24px;
+                border-radius: 28px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-download,
+            .btn-clear {
+                grid-column: auto;
+            }
+
+            .logo {
+                width: 50px;
+                height: 50px;
+                font-size: 26px;
+            }
+        }
+        /* iOS Control Center Blur */
+.ios-blur {
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(35px) saturate(180%);
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+  border-radius: 28px;
+  padding: 30px;
+  box-shadow: 
+    0 40px 80px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+/* Status bar */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: white;
+  font-size: 14px;
+}
+.hidden { display: none; }
+
+/* iOS Spinner */
+.spinner-ios {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Song list */
+.songs-panel {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.25);
+  padding: 16px;
+  border-radius: 22px;
+}
+
+.songs-panel ul {
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.songs-panel li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  font-size: 14px;
+  color: #fff;
+}
+
+/* Player */
+.player {
+  margin-top: 20px;
+}
+audio {
+  width: 100%;
+  border-radius: 14px;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Water effect bubbles -->
+    <div class="water-bubble water-bubble-1"></div>
+    <div class="water-bubble water-bubble-2"></div>
+    <div class="water-bubble water-bubble-3"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                <span class="theme-icon sun"></span>
+                <span class="theme-icon moon">🌙</span>
+            </div>
+            <h1>Mashup Creator</h1>
+            <p>Transform your favorite artist's songs into one seamless musical experience</p>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <form id="mashupForm">
+            <div class="form-group">
+                <label for="singer">Artist Name</label>
+                <input 
+                    type="text" 
+                    id="singer" 
+                    name="singer" 
+                    placeholder="e.g., Taylor Swift, The Weeknd"
+                    autocomplete="off"
+                    required
+                >
+                <div class="helper-text">Start typing to see suggestions</div>
+            </div>
+
+            <div class="form-group">
+                <label for="videos">Number of Videos</label>
+                <input 
+                    type="number" 
+                    id="videos" 
+                    name="videos" 
+                    min="11" 
+                    max="50"
+                    value="15"
+                    required
+                >
+                <div class="helper-text">Minimum 11 videos, maximum 50</div>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Duration per Song (seconds)</label>
+                <input 
+                    type="number" 
+                    id="duration" 
+                    name="duration" 
+                    min="21" 
+                    max="120"
+                    value="30"
+                    required
+                >
+                <div class="helper-text">Minimum 21 seconds, maximum 120</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="your.email@example.com"
+                    required
+                >
+                <div class="helper-text">For receiving the download link</div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="sendEmail" name="sendEmail">
+                <label for="sendEmail">Send mashup to my email</label>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-generate">
+                    Generate Mashup
+                    <span class="keyboard-shortcut"></span>
+                </button>
+            </div>
+
+            <div class="button-group" id="actionButtons" style="display: none; margin-top: 15px;">
+                <button type="button" class="btn-download" id="downloadBtn">
+                    Download
+                    <span class="keyboard-shortcut"></span>
+                </button>
+                <button type="button" class="btn-clear" id="clearBtn">
+                    Create New
+                    <span class="keyboard-shortcut"></span>
+                </button>
+            </div>
+        </form>
+
+        <div class="player-section" id="playerSection">
+            <div class="player-header">
+                <h3>Your Mashup is Ready</h3>
+                <p>Listen and download your creation</p>
+            </div>
+            <audio id="audioPlayer" controls>
+                <source src="/download" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <div class="player-info" id="playerInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('mashupForm');
+        const messageContainer = document.getElementById('messageContainer');
+        const playerSection = document.getElementById('playerSection');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playerInfo = document.getElementById('playerInfo');
+        const actionButtons = document.getElementById('actionButtons');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // Dynamic elements
+        let progressInterval;
+        let estimatedTime = 0;
+        const popularArtists = [
+            'Taylor Swift', 'The Weeknd', 'Ed Sheeran', 'Dua Lipa', 'Billie Eilish',
+            'Ariana Grande', 'Bruno Mars', 'Adele', 'Justin Bieber', 'Rihanna',
+            'Katy Perry', 'Lady Gaga', 'Michael Jackson', 'Beyoncé', 'Drake'
+        ];
+
+        // Generate floating cluster particles
+        function createClusterParticles() {
+            const particleCount = 20;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'cluster';
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.animation = `float-particle ${8 + Math.random() * 15}s linear infinite`;
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.setProperty('--random-x', (Math.random() - 0.5) * 200 + 'px');
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Enhanced CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float-particle {
+                0% {
+                    transform: translateY(0) translateX(0) scale(0.8);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 0.4;
+                }
+                90% {
+                    opacity: 0.4;
+                }
+                100% {
+                    transform: translateY(-120vh) translateX(var(--random-x)) scale(1.2);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes pulse-glow {
+                0%, 100% {
+                    box-shadow: 0 0 20px rgba(0, 113, 227, 0.3);
+                }
+                50% {
+                    box-shadow: 0 0 40px rgba(0, 113, 227, 0.6);
+                }
+            }
+
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+
+            .input-error {
+                border-color: #ff3b30 !important;
+                background: rgba(255, 59, 48, 0.02) !important;
+                box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.1) !important;
+                animation: shake 0.3s ease-in-out;
+            }
+
+            .input-success {
+                border-color: #34c759 !important;
+                background: rgba(52, 199, 89, 0.02) !important;
+                box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.1) !important;
+            }
+
+            .progress-container {
+                margin-top: 20px;
+                display: none;
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 8px;
+                background: rgba(0, 113, 227, 0.1);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 10px;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #0071e3, #00bfff);
+                border-radius: 4px;
+                width: 0%;
+                transition: width 0.3s ease;
+                position: relative;
+            }
+
+            .progress-fill::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                animation: shimmer 2s infinite;
+            }
+
+            @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+
+            .progress-text {
+                font-size: 0.85em;
+                color: var(--text-secondary);
+                text-align: center;
+            }
+
+            .suggestions {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1000;
+                display: none;
+            }
+
+            .suggestion-item {
+                padding: 12px 16px;
+                cursor: pointer;
+                border-bottom: 1px solid var(--border);
+                transition: background 0.2s ease;
+            }
+
+            .suggestion-item:hover,
+            .suggestion-item.active {
+                background: rgba(0, 113, 227, 0.05);
+            }
+
+            .suggestion-item:last-child {
+                border-bottom: none;
+            }
+
+            .tooltip {
+                position: relative;
+                display: inline-block;
+            }
+
+            .tooltip .tooltip-text {
+                visibility: hidden;
+                width: 200px;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                text-align: center;
+                border-radius: 8px;
+                padding: 8px 12px;
+                position: absolute;
+                z-index: 1000;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -100px;
+                opacity: 0;
+                transition: opacity 0.3s;
+                font-size: 0.8em;
+                font-weight: 400;
+            }
+
+            .tooltip:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            .retry-btn {
+                background: rgba(255, 152, 0, 0.1);
+                color: #ff9500;
+                border: 1.5px solid rgba(255, 152, 0, 0.3);
+                margin-left: 10px;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 0.8em;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .btn-generate.loading {
+                pointer-events: none;
+                position: relative;
+            }
+
+            .btn-generate.loading::after {
+                content: '';
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-top: 2px solid white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .btn-generate.loading .keyboard-shortcut {
+                display: none;
+            }
+
+            .form-step {
+                opacity: 0.6;
+                transform: translateY(10px);
+                transition: all 0.3s ease;
+            }
+
+            .form-step.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .keyboard-shortcut {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background: var(--accent-blue);
+                color: white;
+                font-size: 0.7em;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-weight: 600;
+            }
+
+            @media (max-width: 600px) {
+                .tooltip .tooltip-text {
+                    width: 150px;
+                    margin-left: -75px;
+                    font-size: 0.75em;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        createClusterParticles();
+
+        // Real-time form validation
+        function validateField(field) {
+            const value = field.value.trim();
+            let isValid = true;
+            let message = '';
+
+            switch(field.id) {
+                case 'singer':
+                    isValid = value.length >= 2;
+                    message = isValid ? '' : 'Artist name must be at least 2 characters';
+                    break;
+                case 'videos':
+                    const videos = parseInt(value);
+                    isValid = videos >= 11 && videos <= 50;
+                    message = isValid ? '' : 'Number of videos must be between 11 and 50';
+                    break;
+                case 'duration':
+                    const duration = parseInt(value);
+                    isValid = duration >= 21 && duration <= 120;
+                    message = isValid ? '' : 'Duration must be between 21 and 120 seconds';
+                    break;
+                case 'email':
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    isValid = emailRegex.test(value);
+                    message = isValid ? '' : 'Please enter a valid email address';
+                    break;
+            }
+
+            field.classList.toggle('input-error', !isValid && value !== '');
+            field.classList.toggle('input-success', isValid && value !== '');
+
+            // Update helper text
+            const helperText = field.parentElement.querySelector('.helper-text');
+            if (helperText) {
+                if (!isValid && value !== '') {
+                    helperText.textContent = message;
+                    helperText.style.color = '#ff3b30';
+                } else {
+                    // Reset to original helper text
+                    switch(field.id) {
+                        case 'videos':
+                            helperText.textContent = 'Minimum 11 videos';
+                            break;
+                        case 'duration':
+                            helperText.textContent = 'Minimum 21 seconds';
+                            break;
+                        case 'email':
+                            helperText.textContent = 'For receiving the download link';
+                            break;
+                        default:
+                            helperText.textContent = '';
+                    }
+                    helperText.style.color = 'var(--text-secondary)';
+                }
+            }
+
+            return isValid;
+        }
+
+        // Artist suggestions
+        function showSuggestions(input, suggestions) {
+            let suggestionsContainer = input.parentElement.querySelector('.suggestions');
+            if (!suggestionsContainer) {
+                suggestionsContainer = document.createElement('div');
+                suggestionsContainer.className = 'suggestions';
+                input.parentElement.style.position = 'relative';
+                input.parentElement.appendChild(suggestionsContainer);
+            }
+
+            if (suggestions.length > 0) {
+                suggestionsContainer.innerHTML = suggestions
+                    .map((artist, index) => `<div class="suggestion-item" data-index="${index}">${artist}</div>`)
+                    .join('');
+                suggestionsContainer.style.display = 'block';
+
+                // Add click handlers
+                suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        input.value = item.textContent;
+                        suggestionsContainer.style.display = 'none';
+                        validateField(input);
+                    });
+                });
+            } else {
+                suggestionsContainer.style.display = 'none';
+            }
+        }
+
+        // Progress tracking
+        function startProgressTracking() {
+            const progressContainer = document.querySelector('.progress-container');
+            const progressFill = document.querySelector('.progress-fill');
+            const progressText = document.querySelector('.progress-text');
+
+            if (!progressContainer) {
+                const container = document.createElement('div');
+                container.className = 'progress-container';
+                container.innerHTML = `
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">Initializing...</div>
+                `;
+                form.appendChild(container);
+            }
+
+            document.querySelector('.progress-container').style.display = 'block';
+
+            let progress = 0;
+            const steps = [
+                'Searching for songs...',
+                'Downloading audio files...',
+                'Processing audio...',
+                'Creating mashup...',
+                'Finalizing...'
+            ];
+            let stepIndex = 0;
+
+            progressInterval = setInterval(() => {
+                progress += Math.random() * 3;
+                if (progress >= 25 * (stepIndex + 1)) {
+                    stepIndex = Math.min(stepIndex + 1, steps.length - 1);
+                }
+
+                document.querySelector('.progress-fill').style.width = Math.min(progress, 100) + '%';
+                document.querySelector('.progress-text').textContent = steps[stepIndex];
+
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                }
+            }, 1000);
+        }
+
+        function stopProgressTracking() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            const progressContainer = document.querySelector('.progress-container');
+            if (progressContainer) {
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // Enhanced message display
+        function showMessage(message, type, retryCallback = null) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+
+            let content = '';
+            if (type === 'loading') {
+                content = `<span class="spinner"></span><span>${message}</span>`;
+            } else if (type === 'error' && retryCallback) {
+                content = `<span>${message}</span><button class="retry-btn" onclick="(${retryCallback.toString()})()">Retry</button>`;
+            } else {
+                content = message;
+            }
+
+            div.innerHTML = content;
+
+            messageContainer.innerHTML = '';
+            messageContainer.appendChild(div);
+
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (div.parentElement) {
+                        div.style.animation = 'slideOut 0.3s ease-out';
+                        setTimeout(() => div.remove(), 300);
+                    }
+                }, 5000);
+            }
+        }
+
+        function hideMessage() {
+            messageContainer.innerHTML = '';
+        }
+
+        // Add tooltips to form labels
+        function addTooltips() {
+            const tooltips = {
+                'singer': 'Enter the name of your favorite artist or band',
+                'videos': 'More videos = more variety in your mashup (11-50)',
+                'duration': 'How long each song plays in the mashup (21-120 seconds)',
+                'email': 'We\'ll send you a download link when ready'
+            };
+
+            Object.keys(tooltips).forEach(id => {
+                const label = document.querySelector(`label[for="${id}"]`);
+                if (label) {
+                    label.className = 'tooltip';
+                    label.innerHTML += `<span class="tooltip-text">${tooltips[id]}</span>`;
+                }
+            });
+        }
+
+        // Keyboard shortcuts
+        function addKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + Enter to submit
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!form.querySelector('.btn-generate').disabled) {
+                        form.dispatchEvent(new Event('submit'));
+                    }
+                }
+
+                // Ctrl/Cmd + D to download (when available)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                    e.preventDefault();
+                    if (actionButtons.style.display !== 'none') {
+                        downloadBtn.click();
+                    }
+                }
+
+                // Escape to clear form
+                if (e.key === 'Escape') {
+                    clearBtn.click();
+                }
+            });
+
+            // Add visual indicators for shortcuts
+            const submitBtn = form.querySelector('.btn-generate');
+            submitBtn.innerHTML += '<span class="keyboard-shortcut">⌘↵</span>';
+        }
+
+        // Initialize dynamic features
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+            addTooltips();
+            addKeyboardShortcuts();
+
+            // Real-time validation
+            ['singer', 'videos', 'duration', 'email'].forEach(id => {
+                const field = document.getElementById(id);
+                field.addEventListener('input', () => validateField(field));
+                field.addEventListener('blur', () => validateField(field));
+            });
+
+            // Artist suggestions
+            const singerInput = document.getElementById('singer');
+            singerInput.addEventListener('input', (e) => {
+                const value = e.target.value.toLowerCase();
+                if (value.length >= 1) {
+                    const matches = popularArtists.filter(artist =>
+                        artist.toLowerCase().includes(value)
+                    ).slice(0, 5);
+                    showSuggestions(e.target, matches);
+                } else {
+                    const suggestions = singerInput.parentElement.querySelector('.suggestions');
+                    if (suggestions) suggestions.style.display = 'none';
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.form-group')) {
+                    document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none');
+                }
+            });
+
+            // Keyboard navigation for suggestions
+            singerInput.addEventListener('keydown', (e) => {
+                const suggestions = singerInput.parentElement.querySelector('.suggestions');
+                if (!suggestions || suggestions.style.display === 'none') return;
+
+                const items = suggestions.querySelectorAll('.suggestion-item');
+                let activeIndex = -1;
+
+                items.forEach((item, index) => {
+                    if (item.classList.contains('active')) activeIndex = index;
+                });
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    activeIndex = Math.max(activeIndex - 1, -1);
+                } else if (e.key === 'Enter' && activeIndex >= 0) {
+                    e.preventDefault();
+                    items[activeIndex].click();
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    item.classList.toggle('active', index === activeIndex);
+                });
+            });
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const singer = document.getElementById('singer').value.trim();
+            const videos = document.getElementById('videos').value;
+            const duration = document.getElementById('duration').value;
+            const email = document.getElementById('email').value.trim();
+            const sendEmail = document.getElementById('sendEmail').checked;
+
+            // Validate all fields
+            const fields = ['singer', 'videos', 'duration', 'email'];
+            let allValid = true;
+            fields.forEach(id => {
+                if (!validateField(document.getElementById(id))) {
+                    allValid = false;
+                }
+            });
+
+            if (!allValid) {
+                showMessage('Please correct the highlighted fields', 'error');
+                return;
+            }
+
+            form.querySelector('.btn-generate').disabled = true;
+            form.querySelector('.btn-generate').classList.add('loading');
+            showMessage('Starting mashup generation...', 'loading');
+            playerSection.classList.remove('active');
+            actionButtons.style.display = 'none';
+
+            // Start progress tracking
+            startProgressTracking();
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        singer,
+                        videos: parseInt(videos),
+                        duration: parseInt(duration),
+                        email,
+                        sendEmail
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate mashup');
+                }
+
+                stopProgressTracking();
+                showMessage(`✓ ${data.message} (${data.fileSize})`, 'success');
+                playerInfo.textContent = `File size: ${data.fileSize} | Generated: ${new Date(data.timestamp).toLocaleString()}`;
+                playerSection.classList.add('active');
+                actionButtons.style.display = 'grid';
+
+                audioPlayer.load();
+
+                // Add success animation
+                playerSection.style.animation = 'pulse-glow 2s ease-in-out';
+
+            } catch (error) {
+                stopProgressTracking();
+                showMessage(`✕ Error: ${error.message}`, 'error', () => {
+                    form.dispatchEvent(new Event('submit'));
+                });
+            } finally {
+                form.querySelector('.btn-generate').disabled = false;
+                form.querySelector('.btn-generate').classList.remove('loading');
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = '/download';
+            link.download = `mashup_${document.getElementById('singer').value.replace(/\s+/g, '_')}.mp3`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Show download success message
+            showMessage('Download started!', 'success');
+        });
+
+        clearBtn.addEventListener('click', () => {
+            form.reset();
+            hideMessage();
+            playerSection.classList.remove('active');
+            actionButtons.style.display = 'none';
+            stopProgressTracking();
+            document.getElementById('videos').value = '15';
+            document.getElementById('duration').value = '30';
+
+            // Reset validation states
+            ['singer', 'videos', 'duration', 'email'].forEach(id => {
+                const field = document.getElementById(id);
+                field.classList.remove('input-error', 'input-success');
+                const helperText = field.parentElement.querySelector('.helper-text');
+                if (helperText) {
+                    helperText.style.color = 'var(--text-secondary)';
+                }
+            });
+        });
+
+        // Add slideOut animation
+        const slideOutStyle = document.createElement('style');
+        slideOutStyle.textContent = `
+            @keyframes slideOut {
+                to {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+            }
+        `;
+        document.head.appendChild(slideOutStyle);
+    </script>
+</body>
+</html>
